@@ -128,7 +128,7 @@ async fn hello(name: web::Path<String>) -> impl Responder {
 async fn events() -> impl Responder {
     let server_sent_event = move || {
         let interval = IntervalStream::new(interval(Duration::from_secs(1)));
-        interval.map(move |_| Ok::<_, Error>(Bytes::from("id:1\ndata: Server-sent event\n\n")))
+        interval.map(move |_| Ok::<_, Error>(Bytes::from("id:1\ndata: Server-sent event \n\n")))
     };
 
     HttpResponse::Ok()
