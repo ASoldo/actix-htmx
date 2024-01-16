@@ -1,0 +1,18 @@
+[package]
+name = "actix-htmx"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix = "0.13.1"
+actix-web = "4.4.1"
+actix-web-actors = "4.2.0"
+futures = "0.3.30"
+mime = "0.3.17"
+serde = "1.0.195"
+serde_json = "1.0.111"
+tera = "1.19.1"
+tokio = "1.35.1"
+tokio-stream = "0.1.14"

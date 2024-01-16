@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title></title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+</head>
+
+<body>
+  <h1>Working</h1>
+  <div hx-ext="ws" ws-connect="/ws/">
+    <div id="chat_room" hx-swap-oob="morphdom">...</div>
+    <form id="form" ws-send>
+      <input name="chat_message" />
+      <button type="submit">submit</button>
+    </form>
+  </div>
+  <div hx-ext="sse" sse-connect="/events" sse-swap="message" hx-target="#event" hx-swap="beforeend">
+    <div id="event"></div>
+  </div>
+</body>
+
+</html>
