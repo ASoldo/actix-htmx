@@ -5,6 +5,7 @@ use actix_web::middleware::Logger;
 use actix_web::web::{Bytes, Data};
 use actix_web::{get, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder};
 use actix_web_actors::ws;
+use ammonia::clean;
 use futures::lock::Mutex;
 use futures::stream::StreamExt;
 use serde_json::Value;
@@ -25,9 +26,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ChatSocket {
             Ok(ws::Message::Text(text)) => {
                 if let Ok(parsed) = serde_json::from_str::<Value>(&text) {
                     if let Some(chat_message) = parsed["chat_message"].as_str() {
+                        let sanitized_message = clean(&chat_message);
                         ctx.text(format!(
                             "<div id=\"chat_room\" hx-swap-oob=\"beforeend\">{}<br></div>",
-                            chat_message
+                            sanitized_message
                         ));
                     }
                 }

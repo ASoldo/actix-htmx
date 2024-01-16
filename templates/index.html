@@ -16,9 +16,9 @@
   <div id="increment" hx-get="/increment" hx-on--before-request="console.log(this, event)"
     hx-on--after-request="console.log(this, event)" hx-target="#increment" hx-trigger="load, click"></div>
   <div hx-ext="ws" ws-connect="/ws/">
-    <div id="chat_room" hx-swap-oob="morphdom">...</div>
+    <div id="chat_room"></div>
     <form id="form" ws-send>
-      <input name="chat_message" />
+      <input name="chat_message" type="text" placeholder="Type your message..." />
       <button type="submit">submit</button>
     </form>
   </div>
