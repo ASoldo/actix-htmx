@@ -12,7 +12,9 @@
 
 <body>
   <h1>Working</h1>
-  <div hx-get="/cookie" hx-trigger="load"></div>
+  <div hx-get="/cookie" hx-trigger="load, click" hx-swap="innerHTML"></div>
+  <div id="increment" hx-get="/increment" hx-on--before-request="console.log(this, event)"
+    hx-on--after-request="console.log(this, event)" hx-target="#increment" hx-trigger="load, click"></div>
   <div hx-ext="ws" ws-connect="/ws/">
     <div id="chat_room" hx-swap-oob="morphdom">...</div>
     <form id="form" ws-send>

@@ -2,9 +2,10 @@ use actix::{Actor, ActorContext, AsyncContext, StreamHandler};
 use actix_web::cookie::Cookie;
 use actix_web::http::header::CACHE_CONTROL;
 use actix_web::middleware::Logger;
-use actix_web::web::Bytes;
+use actix_web::web::{Bytes, Data};
 use actix_web::{get, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder};
 use actix_web_actors::ws;
+use futures::lock::Mutex;
 use futures::stream::StreamExt;
 use serde_json::Value;
 use std::time::Duration;
@@ -70,16 +71,58 @@ async fn index() -> impl Responder {
     HttpResponse::Ok().body(rendered)
 }
 
+struct Counter {
+    count: Mutex<i32>,
+}
+
+#[get("/increment")]
+async fn get_comp(counter: Data<Counter>) -> impl Responder {
+    let tera = match Tera::new("templates/**/*") {
+        Ok(t) => t,
+        Err(e) => {
+            panic!("Problem setting up Tera: {:?}", e);
+        }
+    };
+
+    let name = "Increment-Andrey";
+    let last_name = "Kowalski";
+    let mut counter = counter.count.lock().await;
+    *counter += 1;
+
+    let mut context = Context::new();
+    context.insert("name", &name);
+    context.insert("last_name", &last_name);
+    context.insert("counter", &*counter);
+
+    let rendered = tera
+        .render("comp.html", &context)
+        .expect("Failed to render template.");
+
+    HttpResponse::Ok().body(rendered)
+}
+
 #[get("/cookie")]
 async fn cookie(req: HttpRequest) -> impl Responder {
-    let cookie = Cookie::new("name", "Andrzej");
+    let mut counter = if let Some(cookie) = req.cookie("counter") {
+        cookie.value().parse::<i32>().unwrap_or(0) + 1
+    } else {
+        0
+    };
 
-    if let Some(cookie) = req.cookie("name") {
-        println!("Updating existing cookie: {:?}", cookie.value());
-    }
+    let new_cookie = Cookie::new("counter", counter.to_string());
     let mut response = HttpResponse::Ok();
-    response.cookie(cookie);
-    response
+    response.cookie(new_cookie);
+
+    let tera = Tera::new("templates/**/*").expect("Problem setting up Tera");
+    let mut context = Context::new();
+    context.insert("name", "Cookie-Andrzej");
+    context.insert("last_name", "Kowalski");
+    context.insert("user_counter", &counter.to_string());
+
+    let rendered = tera
+        .render("comp-user.html", &context)
+        .expect("Failed to render template.");
+    response.body(rendered)
 }
 
 #[get("/name/{name}")]
@@ -102,13 +145,18 @@ async fn events() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let counter = Data::new(Counter {
+        count: Mutex::new(0),
+    });
+    HttpServer::new(move || {
         App::new()
+            .app_data(counter.clone())
             .service(index)
             .service(hello)
             .service(events)
             .service(ws_index)
             .service(cookie)
+            .service(get_comp)
             .wrap(Logger::default())
     })
     .bind(("127.0.0.1", 8080))?
