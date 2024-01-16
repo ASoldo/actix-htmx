@@ -1,4 +1,5 @@
 use actix::{Actor, ActorContext, AsyncContext, StreamHandler};
+use actix_web::cookie::Cookie;
 use actix_web::http::header::CACHE_CONTROL;
 use actix_web::middleware::Logger;
 use actix_web::web::Bytes;
@@ -61,12 +62,24 @@ async fn index() -> impl Responder {
         }
     };
 
-    let mut context = Context::new();
+    let context = Context::new();
 
     let rendered = tera
         .render("index.html", &context)
         .expect("Failed to render template.");
     HttpResponse::Ok().body(rendered)
+}
+
+#[get("/cookie")]
+async fn cookie(req: HttpRequest) -> impl Responder {
+    let cookie = Cookie::new("name", "Andrzej");
+
+    if let Some(cookie) = req.cookie("name") {
+        println!("Updating existing cookie: {:?}", cookie.value());
+    }
+    let mut response = HttpResponse::Ok();
+    response.cookie(cookie);
+    response
 }
 
 #[get("/name/{name}")]
@@ -95,6 +108,7 @@ async fn main() -> std::io::Result<()> {
             .service(hello)
             .service(events)
             .service(ws_index)
+            .service(cookie)
             .wrap(Logger::default())
     })
     .bind(("127.0.0.1", 8080))?

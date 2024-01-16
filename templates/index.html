@@ -12,6 +12,7 @@
 
 <body>
   <h1>Working</h1>
+  <div hx-get="/cookie" hx-trigger="load"></div>
   <div hx-ext="ws" ws-connect="/ws/">
     <div id="chat_room" hx-swap-oob="morphdom">...</div>
     <form id="form" ws-send>
