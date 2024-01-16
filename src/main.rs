@@ -16,6 +16,14 @@ use tokio_stream::wrappers::IntervalStream;
 
 struct ChatSocket;
 
+struct Counter {
+    count: Mutex<i32>,
+}
+
+struct TeraTemplates {
+    tera: Tera,
+}
+
 impl Actor for ChatSocket {
     type Context = ws::WebsocketContext<Self>;
 }
@@ -57,35 +65,18 @@ async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse
 }
 
 #[get("/")]
-async fn index() -> impl Responder {
-    let tera = match Tera::new("templates/**/*") {
-        Ok(t) => t,
-        Err(e) => {
-            panic!("Problem setting up Tera: {:?}", e);
-        }
-    };
-
+async fn index(tera: Data<TeraTemplates>) -> impl Responder {
     let context = Context::new();
 
     let rendered = tera
+        .tera
         .render("index.html", &context)
         .expect("Failed to render template.");
     HttpResponse::Ok().body(rendered)
 }
 
-struct Counter {
-    count: Mutex<i32>,
-}
-
 #[get("/increment")]
-async fn get_comp(counter: Data<Counter>) -> impl Responder {
-    let tera = match Tera::new("templates/**/*") {
-        Ok(t) => t,
-        Err(e) => {
-            panic!("Problem setting up Tera: {:?}", e);
-        }
-    };
-
+async fn get_comp(counter: Data<Counter>, tera: Data<TeraTemplates>) -> impl Responder {
     let name = "Increment-Andrey";
     let last_name = "Kowalski";
     let mut counter = counter.count.lock().await;
@@ -97,6 +88,7 @@ async fn get_comp(counter: Data<Counter>) -> impl Responder {
     context.insert("counter", &*counter);
 
     let rendered = tera
+        .tera
         .render("comp.html", &context)
         .expect("Failed to render template.");
 
@@ -104,7 +96,7 @@ async fn get_comp(counter: Data<Counter>) -> impl Responder {
 }
 
 #[get("/cookie")]
-async fn cookie(req: HttpRequest) -> impl Responder {
+async fn cookie(req: HttpRequest, tera: Data<TeraTemplates>) -> impl Responder {
     let mut counter = if let Some(cookie) = req.cookie("counter") {
         cookie.value().parse::<i32>().unwrap_or(0) + 1
     } else {
@@ -115,13 +107,13 @@ async fn cookie(req: HttpRequest) -> impl Responder {
     let mut response = HttpResponse::Ok();
     response.cookie(new_cookie);
 
-    let tera = Tera::new("templates/**/*").expect("Problem setting up Tera");
     let mut context = Context::new();
     context.insert("name", "Cookie-Andrzej");
     context.insert("last_name", "Kowalski");
     context.insert("user_counter", &counter.to_string());
 
     let rendered = tera
+        .tera
         .render("comp-user.html", &context)
         .expect("Failed to render template.");
     response.body(rendered)
@@ -150,9 +142,15 @@ async fn main() -> std::io::Result<()> {
     let counter = Data::new(Counter {
         count: Mutex::new(0),
     });
+
+    let tera_templates = Data::new(TeraTemplates {
+        tera: Tera::new("templates/**/*").expect("Problem setting up Tera"),
+    });
+
     HttpServer::new(move || {
         App::new()
             .app_data(counter.clone())
+            .app_data(tera_templates.clone())
             .service(index)
             .service(hello)
             .service(events)
