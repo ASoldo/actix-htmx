@@ -37,13 +37,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ChatSocket {
                         let sanitized_message = clean(&chat_message);
                         ctx.text(format!(
                             "<div id=\"chat_room\" hx-swap-oob=\"beforeend\">{}<br></div>\n
-                            <form id=\"form\" ws-send hx-swap-oob=\"morphdom\">
-                                <label>
-                                    <input id=\"typed_message\" name=\"chat_message\" type=\"text\" placeholder=\"Type your message...\" autofocus autocomplete />
-                                </label>
-                                <button type=\"submit\">submit</button>
-                            </form>
-                        ",
+<form id=\"form\" ws-send hx-swap-oob=\"morphdom\">
+    <label>
+        <input id=\"typed_message\" name=\"chat_message\" type=\"text\" placeholder=\"Type your message...\" autofocus autocomplete />
+    </label>
+    <button type=\"submit\">submit</button>
+</form>\n",
                             sanitized_message
                         ));
                     }
