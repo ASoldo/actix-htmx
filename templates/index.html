@@ -18,7 +18,10 @@
   <div hx-ext="ws" ws-connect="/ws/">
     <div id="chat_room"></div>
     <form id="form" ws-send>
-      <input name="chat_message" type="text" placeholder="Type your message..." />
+      <label>
+        <input id="typed_message" name="chat_message" type="text" placeholder="Type your message..." autofocus
+          autocomplete="chat_message" />
+      </label>
       <button type="submit">submit</button>
     </form>
   </div>
