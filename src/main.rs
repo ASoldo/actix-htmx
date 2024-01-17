@@ -39,7 +39,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ChatSocket {
                             "<div id=\"chat_room\" hx-swap-oob=\"beforeend\">{}<br></div>\n
 <form id=\"form\" ws-send hx-swap-oob=\"morphdom\">
     <label>
-        <input id=\"typed_message\" name=\"chat_message\" type=\"text\" placeholder=\"Type your message...\" autofocus autocomplete />
+        <input id=\"typed_message\" name=\"chat_message\" type=\"text\" placeholder=\"Type your message...\" autofocus autocomplete required minlength=\"5\" maxlength=\"20\" />
     </label>
     <button type=\"submit\">submit</button>
 </form>\n",
