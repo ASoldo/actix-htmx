@@ -1,0 +1,33 @@
+{% extends "index.html" %} {% block content%}
+<article>
+  <h1>Main Content Here</h1>
+  <div id="my_form" hx-swap="outerHTML">
+    <form hx-boost="true" hx-post="/login">
+      <input type="text" name="email" value="" placeholder="email" />
+      <input type="password" name="password" value="" placeholder="password" />
+      <button type="submit">Login</button>
+      <h1>Status</h1>
+    </form>
+  </div>
+  <div hx-get="/cookie" hx-trigger="load, click" hx-swap="innerHTML"></div>
+  <div id="increment" hx-get="/increment" hx-on--before-request="console.log(this, event)"
+    hx-on--after-request="console.log(this, event)" hx-target="#increment" hx-trigger="load, click"></div>
+  <div hx-ext="ws" ws-connect="/ws/">
+    <div id="chat_room"></div>
+    <form id="form" ws-send>
+      <label>
+        <input id="typed_message" name="chat_message" type="text" placeholder="Type your message..." autofocus
+          autocomplete="chat_message" required minlength="5" maxlength="20"
+          class="px-5 py-2 mt-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-300 focus:ring-opacity-40" />
+      </label>
+      <button type="submit" class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900">
+        Submit
+      </button>
+    </form>
+  </div>
+  <div hx-ext="sse" sse-connect="/events" sse-swap="message" hx-target="#event" hx-swap="beforeend">
+    <div id="event"></div>
+  </div>
+  <h1 id="end_of_content">End of Content</h1>
+</article>
+{% endblock %}

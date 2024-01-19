@@ -4,38 +4,28 @@
 <head>
   <title></title>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"" />
+  <script src=" https://unpkg.com/htmx.org@1.9.10">
+  </script>
   <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    main#main_content {
+      scroll-behavior: smooth;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Working</h1>
-
-  <div id="my_form" hx-swap="outerHTML">
-    <form hx-boost="true" hx-post="/login">
-      <input type="text" name="email" value="" placeholder="email" />
-      <input type="password" name="password" value="" placeholder="password" />
-      <button type="submit">Login</button>
-      <h1>Status</h1>
-    </form>
-  </div>
-  <div hx-get="/cookie" hx-trigger="load, click" hx-swap="innerHTML"></div>
-  <div id="increment" hx-get="/increment" hx-on--before-request="console.log(this, event)"
-    hx-on--after-request="console.log(this, event)" hx-target="#increment" hx-trigger="load, click"></div>
-  <div hx-ext="ws" ws-connect="/ws/">
-    <div id="chat_room"></div>
-    <form id="form" ws-send>
-      <label>
-        <input id="typed_message" name="chat_message" type="text" placeholder="Type your message..." autofocus
-          autocomplete="chat_message" required minlength="5" maxlength="20" />
-      </label>
-      <button type="submit">submit</button>
-    </form>
-  </div>
-  <div hx-ext="sse" sse-connect="/events" sse-swap="message" hx-target="#event" hx-swap="beforeend">
-    <div id="event"></div>
+  <div class="flex flex-col h-[100dvh] overflow-hidden">
+    {% include "components/navigation.html" %}
+    <main id="main_content" class="flex-grow overflow-scroll">
+      {% block content %}
+      {% endblock %}
+    </main>
+    {% include "components/footer.html" %}
   </div>
 </body>
 

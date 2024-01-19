@@ -241,7 +241,18 @@ async fn index(tera: Data<TeraTemplates>) -> impl Responder {
 
     let rendered = tera
         .tera
-        .render("index.html", &context)
+        .render("home.html", &context)
+        .expect("Failed to render template.");
+    HttpResponse::Ok().body(rendered)
+}
+
+#[get("/content")]
+async fn content(tera: Data<TeraTemplates>) -> impl Responder {
+    let context = Context::new();
+
+    let rendered = tera
+        .tera
+        .render("content.html", &context)
         .expect("Failed to render template.");
     HttpResponse::Ok().body(rendered)
 }
@@ -329,6 +340,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(tera_templates.clone())
             .service(login)
             .service(logout)
+            .service(content)
             .service(get_leaderboard)
             .service(index)
             .service(hello)
