@@ -10,18 +10,12 @@
   <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    main#main_content {
-      scroll-behavior: smooth;
-    }
-  </style>
 </head>
 
 <body>
   <div class="flex flex-col h-[100dvh] overflow-hidden">
     {% include "components/navigation.html" %}
-    <main id="main_content" class="flex-grow overflow-scroll overflow-x-hidden">
+    <main class="flex-grow overflow-scroll overflow-x-hidden scroll-smooth">
       {% block content %}
       {% endblock %}
     </main>
