@@ -216,7 +216,7 @@ async fn login(credentials: web::Form<LoginRequest>) -> impl Responder {
     }
 }
 
-#[get("/leaderboard")]
+#[get("/api/leaderboard")]
 async fn get_leaderboard(sb: Data<Postgrest>) -> impl Responder {
     let resp = sb.from("leaderboard").select("*").execute().await.unwrap();
     let body = resp.text().await.unwrap();
@@ -228,22 +228,35 @@ async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse
     ws::start(ChatSocket {}, &req, stream)
 }
 
+#[derive(Serialize)]
+pub struct Navigation {
+    pub current_page: String,
+}
+
+impl Navigation {
+    pub fn new(current_page: &str) -> Self {
+        Navigation { current_page: current_page.to_string() }
+    }
+}
+
+async fn render_template(tera: &Data<TeraTemplates>, page: &str, template: &str) -> impl Responder {
+    let navigation = Navigation::new(page);
+    let mut context = Context::new();
+    context.insert(String::from("navigation"), &navigation);
+    match tera.tera.render(template, &context) {
+        Ok(rendered) => HttpResponse::Ok().body(rendered),
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
+}
+
 #[get("/")]
 async fn index(tera: Data<TeraTemplates>) -> impl Responder {
-    let mut context = Context::new();
-    context.insert("current_page", "home");
-
-    let rendered = tera.tera.render("home.html", &context).expect("Failed to render template.");
-    HttpResponse::Ok().body(rendered)
+    render_template(&tera, "home", "home.html").await
 }
 
 #[get("/about")]
 async fn about(tera: Data<TeraTemplates>) -> impl Responder {
-    let mut context = Context::new();
-    context.insert("current_page", "about");
-
-    let rendered = tera.tera.render("about.html", &context).expect("Failed to render template.");
-    HttpResponse::Ok().body(rendered)
+    render_template(&tera, "about", "about.html").await
 }
 
 #[get("/content")]
