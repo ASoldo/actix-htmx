@@ -1,10 +1,11 @@
+{% block content %}
 <nav class="bg-gray-800 text-white p-1">
   <ul class="flex space-x-4">
-    <li class="hover:bg-gray-700 rounded-md p-2">
+    <li class="hover:bg-gray-700 {% if current_page == 'home' %}bg-red-500{% endif %} rounded-md p-2">
       <a href="/" class="block">Home</a>
     </li>
-    <li class="hover:bg-gray-700 rounded-md p-2">
-      <a href="/login" class="block">Login</a>
+    <li class="hover:bg-gray-700 {% if current_page == 'about' %}bg-red-500{% endif %} rounded-md p-2">
+      <a href="/about" class="block">About</a>
     </li>
     <li class="hover:bg-gray-700 rounded-md p-2">
       <a href="#end_of_content" class="block">Anchor</a>
@@ -17,3 +18,4 @@
     </li>
   </ul>
 </nav>
+{% endblock %}

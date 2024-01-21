@@ -14,7 +14,7 @@
     hx-on--after-request="console.log(this, event)" hx-target="#increment" hx-trigger="load, click"></div>
   <div hx-ext="ws" ws-connect="/ws/">
     <div id="chat_room"></div>
-    <form id="form" ws-send>
+    <form id="form-ws" ws-send>
       <label>
         <input id="typed_message" name="chat_message" type="text" placeholder="Type your message..." autofocus
           autocomplete="chat_message" required minlength="5" maxlength="20"

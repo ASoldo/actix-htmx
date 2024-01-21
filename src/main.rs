@@ -98,7 +98,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ChatSocket {
                         ctx.text(format!(
                             "
                             <div id=\"chat_room\" hx-swap-oob=\"beforeend\">{}<br></div>\n
-                            <form id=\"form\" ws-send hx-swap-oob=\"morphdom\">
+                            <form id=\"form-ws\" ws-send hx-swap-oob=\"morphdom\">
                                 <label>
                                     <input id=\"typed_message\" name=\"chat_message\" type=\"text\" placeholder=\"Type your message...\" autofocus autocomplete required minlength=\"5\" maxlength=\"20\" />
                                 </label>
@@ -230,9 +230,19 @@ async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse
 
 #[get("/")]
 async fn index(tera: Data<TeraTemplates>) -> impl Responder {
-    let context = Context::new();
+    let mut context = Context::new();
+    context.insert("current_page", "home");
 
     let rendered = tera.tera.render("home.html", &context).expect("Failed to render template.");
+    HttpResponse::Ok().body(rendered)
+}
+
+#[get("/about")]
+async fn about(tera: Data<TeraTemplates>) -> impl Responder {
+    let mut context = Context::new();
+    context.insert("current_page", "about");
+
+    let rendered = tera.tera.render("about.html", &context).expect("Failed to render template.");
     HttpResponse::Ok().body(rendered)
 }
 
@@ -324,6 +334,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(tera_templates.clone())
             .service(login)
             .service(logout)
+            .service(about)
             .service(content)
             .service(get_leaderboard)
             .service(index)
