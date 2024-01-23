@@ -15,6 +15,7 @@ futures = "0.3.30"
 mime = "0.3.17"
 postgrest = "1.6.0"
 reqwest = { version = "0.11.23", features = ["json"] }
+sanity = "0.1.1"
 serde = { version = "1.0.195", features = ["derive"] }
 serde_json = "1.0.111"
 tera = "1.19.1"

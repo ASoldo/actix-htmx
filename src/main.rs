@@ -13,12 +13,14 @@ use futures::stream::StreamExt;
 use postgrest::Postgrest;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{from_value, Value};
 use std::collections::HashMap;
 use tera::{Context, Tera};
 use tokio::time::interval;
 use tokio_stream::wrappers::IntervalStream;
 extern crate dotenv;
+extern crate sanity;
+use sanity::helpers::get_json;
 
 struct ChatSocket;
 
@@ -324,6 +326,47 @@ async fn events() -> impl Responder {
         .streaming(server_sent_event())
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Item {
+    #[serde(rename = "_type")]
+    _type: String,
+    question: String,
+    #[serde(rename = "_createdAt")]
+    _created_at: String,
+    name: String,
+    active: bool,
+    description: String,
+    _id: String,
+    #[serde(rename = "_updatedAt")]
+    _updated_at: String,
+    slug: Slug,
+    image: Image,
+    // Add other fields as needed
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Slug {
+    current: String,
+    _type: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Image {
+    _type: String,
+    asset: Asset,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Asset {
+    _ref: String,
+    _type: String,
+}
+
+#[get("/sanity")]
+async fn get_content() -> impl Responder {
+    HttpResponse::Ok().body("Ej")
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -340,8 +383,39 @@ async fn main() -> std::io::Result<()> {
     let sb = Data::new(supabase);
 
     let counter = Data::new(Counter { count: Mutex::new(0) });
+
+    let sanity_token_key = std::env::var("SANITY_TOKEN_KEY").expect("SANITY_TOKEN_KEY not set");
+    let sanity_project_id = std::env::var("SANITY_PROJECT_ID").expect("SANITY_PROJECT_ID not set");
+
+    let mut sn: sanity::SanityConfig =
+        sanity::create(&sanity_project_id, "production", &sanity_token_key, true);
+    let res = sn.get(&String::from("*[_type == 'item']"));
+    match res {
+        Ok(response) => {
+            let parsed = get_json(response);
+            match parsed {
+                Ok(Value::Object(obj)) => {
+                    if let Some(Value::Array(items_value)) = obj.get("result") {
+                        for item_value in items_value {
+                            // Deserialize each item in the array to an `Item`
+                            match from_value::<Item>(item_value.clone()) {
+                                Ok(item) => println!("{:?}", item.name),
+                                Err(e) => println!("Failed to deserialize item: {:?}", e),
+                            }
+                        }
+                    } else {
+                        println!("Result field is not an array or not present");
+                    }
+                }
+                _ => println!("Failed to parse JSON or not an object at top level"),
+            }
+        }
+        Err(e) => println!("Error fetching data: {:?}", e),
+    }
+
     HttpServer::new(move || {
         App::new()
+            .app_data(sn.clone())
             .app_data(sb.clone())
             .app_data(counter.clone())
             .app_data(tera_templates.clone())
