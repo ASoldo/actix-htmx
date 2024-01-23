@@ -21,6 +21,7 @@ use tokio_stream::wrappers::IntervalStream;
 extern crate dotenv;
 extern crate sanity;
 use sanity::helpers::get_json;
+use std::sync::Arc;
 
 struct ChatSocket;
 
@@ -363,8 +364,41 @@ struct Asset {
 }
 
 #[get("/sanity")]
-async fn get_content() -> impl Responder {
-    HttpResponse::Ok().body("Ej")
+async fn get_content(sn: Data<MySanityConfig>) -> impl Responder {
+    let mut res = sn.sanity_config.clone();
+    let items = res.get(&String::from("*[_type == 'item']"));
+    let mut my_items: Vec<Item> = Vec::<Item>::new();
+    match items {
+        Ok(response) => {
+            let parsed = get_json(response);
+            match parsed {
+                Ok(Value::Object(obj)) => {
+                    if let Some(Value::Array(items_value)) = obj.get("result") {
+                        for item_value in items_value {
+                            // Deserialize each item in the array to an `Item`
+                            match from_value::<Item>(item_value.clone()) {
+                                Ok(item) => {
+                                    println!("{:?}", item.name);
+                                    my_items.push(item)
+                                }
+                                Err(e) => println!("Failed to deserialize item: {:?}", e),
+                            }
+                        }
+                    } else {
+                        println!("Result field is not an array or not present");
+                    }
+                }
+                _ => println!("Failed to parse JSON or not an object at top level"),
+            }
+        }
+        Err(e) => println!("Error fetching data: {:?}", e),
+    }
+
+    HttpResponse::Ok().json(serde_json::json!(my_items))
+}
+
+struct MySanityConfig {
+    sanity_config: sanity::SanityConfig,
 }
 
 #[actix_web::main]
@@ -387,37 +421,17 @@ async fn main() -> std::io::Result<()> {
     let sanity_token_key = std::env::var("SANITY_TOKEN_KEY").expect("SANITY_TOKEN_KEY not set");
     let sanity_project_id = std::env::var("SANITY_PROJECT_ID").expect("SANITY_PROJECT_ID not set");
 
-    let mut sn: sanity::SanityConfig =
-        sanity::create(&sanity_project_id, "production", &sanity_token_key, true);
-    let res = sn.get(&String::from("*[_type == 'item']"));
-    match res {
-        Ok(response) => {
-            let parsed = get_json(response);
-            match parsed {
-                Ok(Value::Object(obj)) => {
-                    if let Some(Value::Array(items_value)) = obj.get("result") {
-                        for item_value in items_value {
-                            // Deserialize each item in the array to an `Item`
-                            match from_value::<Item>(item_value.clone()) {
-                                Ok(item) => println!("{:?}", item.name),
-                                Err(e) => println!("Failed to deserialize item: {:?}", e),
-                            }
-                        }
-                    } else {
-                        println!("Result field is not an array or not present");
-                    }
-                }
-                _ => println!("Failed to parse JSON or not an object at top level"),
-            }
-        }
-        Err(e) => println!("Error fetching data: {:?}", e),
-    }
-
+    let sanity: MySanityConfig = MySanityConfig {
+        sanity_config: sanity::create(&sanity_project_id, "production", &sanity_token_key, true),
+    };
+    let sanity_config = Data::new(sanity);
     HttpServer::new(move || {
         App::new()
+            .app_data(sanity_config.clone())
             .app_data(sb.clone())
             .app_data(counter.clone())
             .app_data(tera_templates.clone())
+            .service(get_content)
             .service(login)
             .service(logout)
             .service(about)
