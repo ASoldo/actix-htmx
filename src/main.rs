@@ -415,7 +415,6 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .app_data(sn.clone())
             .app_data(sb.clone())
             .app_data(counter.clone())
             .app_data(tera_templates.clone())
