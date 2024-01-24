@@ -26,17 +26,20 @@ async fn main() -> std::io::Result<()> {
         tera: Tera::new("templates/**/*").expect("Problem setting up Tera"),
     });
 
-    let supabase_url = std::env::var("SUPABASE_URL").expect("SUPABASE_URL not set");
-    let supabase_public_key =
-        std::env::var("SUPABASE_PUBLIC_KEY").expect("SUPABASE_PUBLIC_KEY not set");
+    let counter = Data::new(Counter { count: Mutex::new(0) });
+
+    let (supabase_url, supabase_public_key) = (
+        std::env::var("SUPABASE_URL").expect("SUPABASE_URL not set"),
+        std::env::var("SUPABASE_PUBLIC_KEY").expect("SUPABASE_PUBLIC_KEY not set"),
+    );
 
     let supabase =
         Data::new(Postgrest::new(supabase_url).insert_header("apikey", supabase_public_key));
 
-    let counter = Data::new(Counter { count: Mutex::new(0) });
-
-    let sanity_token_key = std::env::var("SANITY_TOKEN_KEY").expect("SANITY_TOKEN_KEY not set");
-    let sanity_project_id = std::env::var("SANITY_PROJECT_ID").expect("SANITY_PROJECT_ID not set");
+    let (sanity_token_key, sanity_project_id) = (
+        std::env::var("SANITY_TOKEN_KEY").expect("SANITY_TOKEN_KEY not set"),
+        std::env::var("SANITY_PROJECT_ID").expect("SANITY_PROJECT_ID not set"),
+    );
 
     let sanity_config = Data::new(MySanityConfig {
         sanity_config: Mutex::new(sanity::create(
