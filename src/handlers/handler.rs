@@ -215,7 +215,7 @@ pub async fn events() -> impl Responder {
 
 #[get("/api/sanity")]
 pub async fn get_content(sn: Data<MySanityConfig>) -> impl Responder {
-    let mut res = sn.sanity_config.clone();
+    let mut res = sn.sanity_config.lock().await;
     let items = res.get(&String::from("*[_type == 'item']"));
     let mut my_items: Vec<Item> = Vec::<Item>::new();
     match items {

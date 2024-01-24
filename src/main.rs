@@ -39,7 +39,12 @@ async fn main() -> std::io::Result<()> {
     let sanity_project_id = std::env::var("SANITY_PROJECT_ID").expect("SANITY_PROJECT_ID not set");
 
     let sanity: MySanityConfig = MySanityConfig {
-        sanity_config: sanity::create(&sanity_project_id, "production", &sanity_token_key, true),
+        sanity_config: Mutex::new(sanity::create(
+            &sanity_project_id,
+            "production",
+            &sanity_token_key,
+            true,
+        )),
     };
     let sanity_config = Data::new(sanity);
     HttpServer::new(move || {
