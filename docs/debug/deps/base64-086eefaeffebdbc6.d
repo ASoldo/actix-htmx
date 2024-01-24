@@ -1,0 +1,12 @@
+/home/rootster/Documents/rust-dojo/actix-htmx/docs/debug/deps/libbase64-086eefaeffebdbc6.rmeta: /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/lib.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/chunked_encoder.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/display.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/tables.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/write/mod.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/write/encoder.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/encode.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/decode.rs
+
+/home/rootster/Documents/rust-dojo/actix-htmx/docs/debug/deps/base64-086eefaeffebdbc6.d: /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/lib.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/chunked_encoder.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/display.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/tables.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/write/mod.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/write/encoder.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/encode.rs /home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/decode.rs
+
+/home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/lib.rs:
+/home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/chunked_encoder.rs:
+/home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/display.rs:
+/home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/tables.rs:
+/home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/write/mod.rs:
+/home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/write/encoder.rs:
+/home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/encode.rs:
+/home/rootster/.cargo/registry/src/index.crates.io-6f17d22bba15001f/base64-0.10.1/src/decode.rs:

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Asset","Counter","Image","Item","LoginRequest","MySanityConfig","Navigation","Slug","SupabaseIdentity","SupabaseLoginResponse","SupabaseUser","TeraTemplates","User"]};
