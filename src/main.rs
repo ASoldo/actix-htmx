@@ -2,14 +2,13 @@ mod actors;
 mod configs;
 mod handlers;
 mod models;
-use crate::configs::config::MySanityConfig;
 extern crate dotenv;
 extern crate sanity;
 use crate::handlers::handler::{
     about, content, cookie, events, get_comp, get_content, get_leaderboard, hello, index, login,
     logout, ws_index,
 };
-use crate::models::model::{Counter, TeraTemplates};
+use crate::models::model::{Counter, MySanityConfig, TeraTemplates};
 use actix_web::middleware::Logger;
 use actix_web::web::Data;
 use dotenv::dotenv;
@@ -30,27 +29,27 @@ async fn main() -> std::io::Result<()> {
     let supabase_public_key =
         std::env::var("SUPABASE_PUBLIC_KEY").expect("SUPABASE_PUBLIC_KEY not set");
 
-    let supabase = Postgrest::new(supabase_url).insert_header("apikey", supabase_public_key);
-    let sb = Data::new(supabase);
+    let supabase =
+        Data::new(Postgrest::new(supabase_url).insert_header("apikey", supabase_public_key));
 
     let counter = Data::new(Counter { count: Mutex::new(0) });
 
     let sanity_token_key = std::env::var("SANITY_TOKEN_KEY").expect("SANITY_TOKEN_KEY not set");
     let sanity_project_id = std::env::var("SANITY_PROJECT_ID").expect("SANITY_PROJECT_ID not set");
 
-    let sanity: MySanityConfig = MySanityConfig {
+    let sanity_config = Data::new(MySanityConfig {
         sanity_config: Mutex::new(sanity::create(
             &sanity_project_id,
             "production",
             &sanity_token_key,
             true,
         )),
-    };
-    let sanity_config = Data::new(sanity);
+    });
+
     HttpServer::new(move || {
         App::new()
             .app_data(sanity_config.clone())
-            .app_data(sb.clone())
+            .app_data(supabase.clone())
             .app_data(counter.clone())
             .app_data(tera_templates.clone())
             .service(get_content)

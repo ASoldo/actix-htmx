@@ -1,7 +1,6 @@
 use crate::actors::actor::ChatSocket;
-use crate::configs::config::MySanityConfig;
 use crate::models::model::{
-    Counter, Item, LoginRequest, Navigation, SupabaseLoginResponse, TeraTemplates,
+    Counter, Item, LoginRequest, MySanityConfig, Navigation, SupabaseLoginResponse, TeraTemplates,
 };
 use actix_web::http::header::CACHE_CONTROL;
 use actix_web::web;
@@ -124,11 +123,7 @@ pub async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResp
     ws::start(ChatSocket {}, &req, stream)
 }
 
-pub async fn render_template(
-    tera: &Data<TeraTemplates>,
-    page: &str,
-    template: &str,
-) -> impl Responder {
+async fn render_template(tera: &Data<TeraTemplates>, page: &str, template: &str) -> impl Responder {
     let navigation = Navigation::new(page);
     let mut context = Context::new();
     context.insert(String::from("navigation"), &navigation);

@@ -2,6 +2,7 @@ use futures::lock::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tera::Tera;
+
 pub struct Counter {
     pub count: Mutex<i32>,
 }
@@ -109,4 +110,8 @@ impl Navigation {
     pub fn new(current_page: &str) -> Self {
         Navigation { current_page: current_page.to_string() }
     }
+}
+
+pub struct MySanityConfig {
+    pub sanity_config: Mutex<sanity::SanityConfig>,
 }
