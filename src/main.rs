@@ -403,7 +403,17 @@ async fn get_content(sn: Data<MySanityConfig>) -> impl Responder {
         }
     };
 
-    HttpResponse::Ok().json(serde_json::json!(my_items[0..3]))
+    // Return as JSON Array of Strings
+    // HttpResponse::Ok().json(serde_json::json!(my_items[0..3]
+    //     .iter()
+    //     .map(|item| &item.name)
+    //     .collect::<Vec<&String>>()))
+
+    // Return as JSON Array of Objects
+    HttpResponse::Ok().json(serde_json::json!(my_items[0..my_items.len().min(3)]
+        .iter()
+        .map(|item| serde_json::json!({"name": &item.name}))
+        .collect::<Vec<serde_json::Value>>()))
 }
 
 struct MySanityConfig {
