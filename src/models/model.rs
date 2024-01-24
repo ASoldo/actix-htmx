@@ -94,7 +94,6 @@ pub struct SupabaseIdentity {
 /// This includes information about the item such as type, name, description, and related media.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Item {
-    #[serde(rename = "_type")]
     pub _type: String,
     pub question: String,
     #[serde(rename = "_createdAt")]
