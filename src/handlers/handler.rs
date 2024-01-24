@@ -1,3 +1,4 @@
+/// Handlers for various web endpoints in the application.
 use crate::actors::actor::ChatSocket;
 use crate::models::model::{
     Counter, Item, LoginRequest, MySanityConfig, Navigation, SupabaseLoginResponse, TeraTemplates,
@@ -22,6 +23,10 @@ use serde_json::{from_value, Value};
 use tokio::time::interval;
 use tokio_stream::wrappers::IntervalStream;
 
+/// Logs out the current user.
+///
+/// Clears the authentication cookies, effectively logging out the user.
+/// Returns an HTML form for logging back in.
 #[post("/logout")]
 pub async fn logout() -> impl Responder {
     // Create a cookie to clear the authentication
@@ -52,6 +57,11 @@ pub async fn logout() -> impl Responder {
         ))
 }
 
+/// Authenticates a user and establishes a session.
+///
+/// Expects a `LoginRequest` containing email and password.
+/// If authentication is successful, sets cookies and returns a user-specific greeting.
+/// Otherwise, it returns a form with an error message.
 #[post("/login")]
 pub async fn login(credentials: web::Form<LoginRequest>) -> impl Responder {
     let client = Client::new();
@@ -111,6 +121,10 @@ pub async fn login(credentials: web::Form<LoginRequest>) -> impl Responder {
     }
 }
 
+/// Retrieves the leaderboard data.
+///
+/// Fetches leaderboard data from a Postgrest database and returns it as JSON.
+/// This endpoint requires a valid Postgrest client in the application state.
 #[get("/api/leaderboard")]
 pub async fn get_leaderboard(sb: Data<Postgrest>) -> impl Responder {
     let resp = sb.from("leaderboard").select("*").execute().await.unwrap();
@@ -118,11 +132,17 @@ pub async fn get_leaderboard(sb: Data<Postgrest>) -> impl Responder {
     HttpResponse::Ok().json(body.parse::<Value>().unwrap())
 }
 
+/// Establishes a WebSocket connection for real-time communication.
+///
+/// Initializes a WebSocket session using `ChatSocket` actor for bi-directional communication.
 #[get("/ws/")]
 pub async fn ws_index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
     ws::start(ChatSocket {}, &req, stream)
 }
 
+/// Renders a specified template with navigation context.
+///
+/// Renders a template using Tera templating engine and includes navigation context based on the provided page.
 async fn render_template(tera: &Data<TeraTemplates>, page: &str, template: &str) -> impl Responder {
     let navigation = Navigation::new(page);
     let mut context = Context::new();
@@ -133,16 +153,25 @@ async fn render_template(tera: &Data<TeraTemplates>, page: &str, template: &str)
     }
 }
 
+/// Displays the home page.
+///
+/// Renders the home page using the Tera templating engine.
 #[get("/")]
 pub async fn index(tera: Data<TeraTemplates>) -> impl Responder {
     render_template(&tera, "home", "home.html").await
 }
-
+/// Displays the about page.
+///
+/// Renders the about page using the Tera templating engine.
 #[get("/about")]
 pub async fn about(tera: Data<TeraTemplates>) -> impl Responder {
     render_template(&tera, "about", "about.html").await
 }
 
+/// Renders the content page.
+///
+/// This function renders a static content page using Tera templating engine.
+/// It's an example of how to render a simple HTML page with context.
 #[get("/content")]
 pub async fn content(tera: Data<TeraTemplates>) -> impl Responder {
     let context = Context::new();
@@ -151,6 +180,10 @@ pub async fn content(tera: Data<TeraTemplates>) -> impl Responder {
     HttpResponse::Ok().body(rendered)
 }
 
+/// Increments a counter and displays it on a webpage.
+///
+/// This function demonstrates how to use shared state (in this case, a counter)
+/// across requests. It increments the counter and renders it using Tera templates.
 #[get("/increment")]
 pub async fn get_comp(counter: Data<Counter>, tera: Data<TeraTemplates>) -> impl Responder {
     let name = "Increment-Andrey";
@@ -168,6 +201,10 @@ pub async fn get_comp(counter: Data<Counter>, tera: Data<TeraTemplates>) -> impl
     HttpResponse::Ok().body(rendered)
 }
 
+/// Sets a cookie and displays the cookie's value on a webpage.
+///
+/// This function demonstrates cookie handling in Actix-web. It increments a value
+/// in a cookie on each request and displays this value using Tera templates.
 #[get("/cookie")]
 pub async fn cookie(req: HttpRequest, tera: Data<TeraTemplates>) -> impl Responder {
     let counter = if let Some(cookie) = req.cookie("counter") {
@@ -190,11 +227,19 @@ pub async fn cookie(req: HttpRequest, tera: Data<TeraTemplates>) -> impl Respond
     response.body(rendered)
 }
 
+/// Greets a user with their name.
+///
+/// This function demonstrates path parameters in Actix-web. It extracts a 'name'
+/// parameter from the URL and returns a greeting message.
 #[get("/name/{name}")]
 pub async fn hello(name: web::Path<String>) -> impl Responder {
     HttpResponse::Ok().body(format!("hello {}", name))
 }
 
+/// Provides a server-sent events stream.
+///
+/// This function demonstrates how to implement server-sent events (SSE) in Actix-web.
+/// It sends a simple event every second.
 #[get("/events")]
 pub async fn events() -> impl Responder {
     let server_sent_event = move || {
@@ -208,6 +253,10 @@ pub async fn events() -> impl Responder {
         .streaming(server_sent_event())
 }
 
+/// Fetches content from Sanity CMS.
+///
+/// Retrieves items using a GROQ query from the Sanity CMS and returns them as a JSON array.
+/// This requires a valid Sanity configuration in the application state.
 #[get("/api/sanity")]
 pub async fn get_content(sn: Data<MySanityConfig>) -> impl Responder {
     let mut res = sn.sanity_config.lock().await;

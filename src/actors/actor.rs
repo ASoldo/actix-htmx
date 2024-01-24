@@ -1,14 +1,27 @@
+/// A WebSocket actor for handling real-time chat messages.
+use actix::{Actor, ActorContext, AsyncContext, StreamHandler};
 use actix_web_actors::ws;
 use ammonia::clean;
 use serde_json::Value;
+
+/// A WebSocket actor for handling real-time chat messages.
+///
+/// `ChatSocket` is an actor that uses Actix's WebSocket implementation to handle
+/// incoming WebSocket messages. It is capable of processing text and binary messages,
+/// as well as handling connection closure and continuation frames.
 pub struct ChatSocket;
-use actix::{Actor, ActorContext, AsyncContext, StreamHandler};
 
 impl Actor for ChatSocket {
     type Context = ws::WebsocketContext<Self>;
 }
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ChatSocket {
+    // Handles incoming WebSocket messages.
+    ///
+    /// This method processes different types of WebSocket messages. For text messages,
+    /// it parses the JSON content, sanitizes the 'chat_message' field, and sends the sanitized
+    /// message back to the client. For binary messages, it simply echoes the message back.
+    /// It also handles closing the connection and other control frames.
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {
             Ok(ws::Message::Text(text)) => {
@@ -41,6 +54,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ChatSocket {
         }
     }
 
+    /// Called when the WebSocket connection is established.
+    ///
+    /// This method is triggered when a new WebSocket connection is made with the server.
+    /// It can be used to perform initial setup or send a welcome message to the client.
     fn started(&mut self, ctx: &mut Self::Context) {
         ctx.text("Hello world!");
         println!("Connected: {:?}", ctx.address());
