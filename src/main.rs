@@ -21,7 +21,6 @@ use tokio_stream::wrappers::IntervalStream;
 extern crate dotenv;
 extern crate sanity;
 use sanity::helpers::get_json;
-use std::sync::Arc;
 
 struct ChatSocket;
 
@@ -378,23 +377,33 @@ async fn get_content(sn: Data<MySanityConfig>) -> impl Responder {
                             // Deserialize each item in the array to an `Item`
                             match from_value::<Item>(item_value.clone()) {
                                 Ok(item) => {
-                                    println!("{:?}", item.name);
+                                    // println!("{:?}", item.name);
                                     my_items.push(item)
                                 }
-                                Err(e) => println!("Failed to deserialize item: {:?}", e),
+                                Err(e) => {
+                                    println!("Failed to deserialize item: {:?}", e);
+                                    return HttpResponse::InternalServerError().body(e.to_string());
+                                }
                             }
                         }
                     } else {
                         println!("Result field is not an array or not present");
+                        return HttpResponse::InternalServerError().finish();
                     }
                 }
-                _ => println!("Failed to parse JSON or not an object at top level"),
+                _ => {
+                    println!("Failed to parse JSON or not an object at top level");
+                    return HttpResponse::InternalServerError().finish();
+                }
             }
         }
-        Err(e) => println!("Error fetching data: {:?}", e),
-    }
+        Err(e) => {
+            println!("Error fetching data: {:?}", e);
+            return HttpResponse::InternalServerError().body(e.to_string());
+        }
+    };
 
-    HttpResponse::Ok().json(serde_json::json!(my_items))
+    HttpResponse::Ok().json(serde_json::json!(my_items[0..3]))
 }
 
 struct MySanityConfig {
