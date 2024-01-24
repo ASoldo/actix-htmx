@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["render_template"],"struct":["about","content","cookie","events","get_comp","get_content","get_leaderboard","hello","index","login","logout","ws_index"]};

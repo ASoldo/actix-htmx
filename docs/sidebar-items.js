@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["main"],"mod":["actors","configs","handlers","models"]};

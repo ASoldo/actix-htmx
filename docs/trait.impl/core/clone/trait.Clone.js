@@ -1,3 +1,0 @@
-(function() {var implementors = {
-"actix_htmx":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"struct\" href=\"actix_htmx/models/model/struct.User.html\" title=\"struct actix_htmx::models::model::User\">User</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

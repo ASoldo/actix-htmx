@@ -1,1 +1,0 @@
-window.ALL_CRATES = ["actix_htmx"];

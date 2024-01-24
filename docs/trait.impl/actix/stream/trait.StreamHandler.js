@@ -1,3 +1,0 @@
-(function() {var implementors = {
-"actix_htmx":[["impl StreamHandler&lt;<a class=\"enum\" href=\"https://doc.rust-lang.org/nightly/core/result/enum.Result.html\" title=\"enum core::result::Result\">Result</a>&lt;Message, ProtocolError&gt;&gt; for <a class=\"struct\" href=\"actix_htmx/actors/actor/struct.ChatSocket.html\" title=\"struct actix_htmx::actors::actor::ChatSocket\">ChatSocket</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
