@@ -71,10 +71,19 @@ pub async fn login(credentials: web::Form<LoginRequest>) -> impl Responder {
         Err(_) => return HttpResponse::InternalServerError().json("Error serializing credentials"),
     };
 
-    let res = client.post("https://kxbzixfkcjexfwfacnzq.supabase.co/auth/v1/token?grant_type=password")
-    .header("apikey", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4YnppeGZrY2pleGZ3ZmFjbnpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODQ5NTQzODEsImV4cCI6MjAwMDUzMDM4MX0.Jl5GMoQSyVVgOFAHRIyCEFFgsGe1YahNVCaCjehO0hw")
-    .header("Content-Type", "application/json")
-    .body(creds_json).send().await;
+    // Retrieve the SUPABASE_PUBLIC_KEY from environment
+    let supabase_public_key = match std::env::var("SUPABASE_PUBLIC_KEY") {
+        Ok(key) => key,
+        Err(_) => return HttpResponse::InternalServerError().json("SUPABASE_PUBLIC_KEY not set"),
+    };
+
+    let res = client
+        .post("https://kxbzixfkcjexfwfacnzq.supabase.co/auth/v1/token?grant_type=password")
+        .header("apikey", &supabase_public_key)
+        .header("Content-Type", "application/json")
+        .body(creds_json)
+        .send()
+        .await;
 
     match res {
         Ok(response) => {
