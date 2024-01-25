@@ -25,4 +25,4 @@ doc:
 
 # Serve documentation on a local server
 serve:
-    cargo doc --no-deps --open
+    cargo doc --document-private-items --no-deps --open
