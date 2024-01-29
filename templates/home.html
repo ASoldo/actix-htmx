@@ -25,9 +25,17 @@
       </button>
     </form>
   </div>
+  <form>
+    <button id="dialog-button" class="px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900" type="submit"
+      hx-get="/api/open_dialog" hx-swap="outerHTML" hx-target="#dialog" hx-trigger="click">
+      Open Dialog
+    </button>
+  </form>
   <div hx-ext="sse" sse-connect="/events" sse-swap="message" hx-target="#event" hx-swap="beforeend">
     <div id="event"></div>
   </div>
   <h1 id="end_of_content">End of Content</h1>
+  <dialog id="dialog"
+    class="absolute top-0 left-0 right-0 bottom-0 bg-blue-500 outline-black outline rounded-xl text-white p-4"></dialog>
 </article>
 {% endblock %}

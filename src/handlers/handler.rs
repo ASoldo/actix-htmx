@@ -319,3 +319,26 @@ pub async fn get_content(sn: Data<MySanityConfig>) -> impl Responder {
         .map(|item| serde_json::json!({"name": &item.name}))
         .collect::<Vec<serde_json::Value>>()))
 }
+
+#[get("/api/open_dialog")]
+async fn open_dialog() -> impl Responder {
+    HttpResponse::Ok().body("<dialog id=\"dialog\"
+    class=\"absolute top-0 left-0 right-0 bottom-0 bg-blue-500 outline-black outline rounded-xl text-white p-4\" open>
+    <h1>Olla I am dialog</h1>
+    <p>
+      Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum
+      sint consectetur cupidatat.
+    </p>
+    <div>
+      <button class=\"bg-white text-blue-500 px-4 py-2 rounded-xl\" hx-get=\"/api/close_dialog\" hx-target=\"#dialog\" hx-swap=\"outerHTML\">Close</button>
+    </div>
+  </dialog>
+")
+}
+
+#[get("/api/close_dialog")]
+async fn close_dialog() -> impl Responder {
+    HttpResponse::Ok().body(
+        r#"<dialog id="dialog" class="absolute top-0 left-0 right-0 bottom-0 bg-blue-500 outline-black outline rounded-xl text-white p-4"></dialog>"#,
+    )
+}

@@ -5,8 +5,8 @@ mod models;
 extern crate dotenv;
 extern crate sanity;
 use crate::handlers::handler::{
-    about, content, cookie, events, get_comp, get_content, get_leaderboard, hello, index, login,
-    logout, ws_index,
+    about, close_dialog, content, cookie, events, get_comp, get_content, get_leaderboard, hello,
+    index, login, logout, open_dialog, ws_index,
 };
 use crate::models::model::{Counter, MySanityConfig, TeraTemplates};
 use actix_web::middleware::Logger;
@@ -52,6 +52,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(supabase.clone())
             .app_data(counter.clone())
             .app_data(tera_templates.clone())
+            .service(open_dialog)
+            .service(close_dialog)
             .service(get_content)
             .service(login)
             .service(logout)
