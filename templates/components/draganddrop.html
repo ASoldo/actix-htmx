@@ -1,0 +1,135 @@
+{% block content %}
+<div name="draganddrop" x-data="{
+    isMobile: window.innerWidth < 640,
+    selectedItem: null,
+    slots: {div1: '', div2: '', div3: ''},
+    startingPositions: {drag1: 'start1', drag2: 'start2'},
+    allowDrop(event) {
+        event.preventDefault();
+    },
+    drag(event) {
+      event.dataTransfer.setData('text', event.target.id);
+    },
+    drop(event) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData('text');
+      const draggedElement = document.getElementById(data);
+      const targetId = event.target.id;
+      // Proceed only if the target is a slot
+      if (targetId in this.slots) {
+        // Append the element to the new slot
+        event.target.appendChild(draggedElement);
+        // Update slot occupancy
+        this.slots[targetId] = data;
+      }
+    },
+    selectItem(itemId) {
+      // If tapping the already selected item, deselect it
+      if (this.selectedItem === itemId) {
+        this.selectedItem = null;
+      } else {
+        this.selectedItem = itemId;
+      }
+    },
+
+    placeItem(targetId) {
+      if (this.selectedItem && targetId in this.slots) {
+        const draggedElement = document.getElementById(this.selectedItem);
+        const targetElement = document.getElementById(targetId);
+
+        if (draggedElement) {
+          targetElement.appendChild(draggedElement);
+          this.slots[targetId] = this.selectedItem;
+          this.selectedItem = null; // Deselect item after placing
+        }
+      }
+    },
+
+    reset() {
+      Object.keys(this.startingPositions).forEach((itemId) => {
+        const startId = this.startingPositions[itemId];
+        const item = document.getElementById(itemId);
+        const startDiv = document.getElementById(startId);
+        if (item && startDiv) {
+          startDiv.appendChild(item);
+        }
+      });
+      this.slots = {div1: '', div2: '', div3: ''};
+      this.selectedItem = null;
+    },
+
+    isImageSlotted() {
+      return Object.values(this.slots).includes('drag1');
+    },
+  }" x-init="$watch('isMobile', value => console.log('isMobile', value))">
+  <template x-if="!isMobile">
+    <div>
+      <div class="flex justify-center gap-4 p-10">
+        <div class="bg-amber-200 border-4 border-dotted border-black p-6 w-32 h-32 flex justify-center items-center"
+          id="div1" @drop.prevent="drop($event)" @dragover.prevent="allowDrop($event)"></div>
+        <div class="bg-amber-200 border-4 border-dotted border-black p-6 w-32 h-32 flex justify-center items-center"
+          id="div2" @drop.prevent="drop($event)" @dragover.prevent="allowDrop($event)"></div>
+        <div class="bg-amber-200 border-4 border-dotted border-black p-6 w-32 h-32 flex justify-center items-center"
+          id="div3" @drop.prevent="drop($event)" @dragover.prevent="allowDrop($event)"></div>
+      </div>
+
+      <div class="flex justify-center gap-4 p-10">
+        <div id="start1" class="w-32 h-32 bg-blue-500 flex justify-center items-center">
+          <img class="hover:cursor-move" id="drag1" src="https://via.placeholder.com/150" draggable="true"
+            @dragstart="drag($event)" width="69" height="69" />
+        </div>
+        <div id="start2" class="w-32 h-32 bg-blue-500 flex justify-center items-center">
+          <h1 id="drag2" class="hover:cursor-move" draggable="true" @dragstart="drag($event)" class="text-lg font-bold">
+            Draggable Text
+          </h1>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button @click="reset()" class="px-4 py-2 mt-4 rounded bg-green-600 text-white font-bold hover:bg-green-700">
+          Reset
+        </button>
+        <button x-bind:disabled="!isImageSlotted()" @click="alert('Image slotted successfully!')"
+          class="px-4 py-2 mt-4 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 disabled:opacity-50">
+          Check Image Slot
+        </button>
+      </div>
+    </div>
+  </template>
+
+  <template x-if="isMobile">
+    <div>
+      <div class="flex justify-center gap-4 p-10">
+        <div @click="placeItem('div1')"
+          class="bg-amber-200 border-4 border-dotted border-black p-6 w-32 h-32 flex justify-center items-center"
+          id="div1"></div>
+        <div @click="placeItem('div2')"
+          class="bg-amber-200 border-4 border-dotted border-black p-6 w-32 h-32 flex justify-center items-center"
+          id="div2"></div>
+        <div @click="placeItem('div3')"
+          class="bg-amber-200 border-4 border-dotted border-black p-6 w-32 h-32 flex justify-center items-center"
+          id="div3"></div>
+      </div>
+
+      <div class="flex justify-center gap-4 p-10">
+        <div @click="selectItem('drag1')" id="start1" class="w-32 h-32 bg-blue-500 flex justify-center items-center">
+          <img id="drag1" src="https://via.placeholder.com/150" width="69" height="69" />
+        </div>
+        <div @click="selectItem('drag2')" id="start2" class="w-32 h-32 bg-blue-500 flex justify-center items-center">
+          <h1 id="drag2" class="text-lg font-bold">Draggable Text</h1>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button @click="reset()" class="px-4 py-2 mt-4 rounded bg-green-600 text-white font-bold hover:bg-green-700">
+          Reset
+        </button>
+        <button x-bind:disabled="!isImageSlotted()" @click="alert('Image slotted successfully!')"
+          class="px-4 py-2 mt-4 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 disabled:opacity-50">
+          Check Image Slot
+        </button>
+      </div>
+    </div>
+  </template>
+</div>
+{% endblock %}

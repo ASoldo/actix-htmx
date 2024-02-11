@@ -10,6 +10,8 @@
     </form>
   </div>
   <div hx-get="/cookie" hx-trigger="load, click" hx-swap="innerHTML"></div>
+  <div hx-get="/cookie" hx-trigger="load, click" hx-swap="innerHTML"></div>
+  <div hx-get="/draganddrop" hx-trigger="load" , hx-swap="outerHTML"></div>
   <div id="increment" hx-get="/increment" hx-on--before-request="console.log(this, event)"
     hx-on--after-request="console.log(this, event)" hx-target="#increment" hx-trigger="load, click"></div>
   <div hx-ext="ws" ws-connect="/ws/">

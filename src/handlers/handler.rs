@@ -169,6 +169,22 @@ async fn render_template(tera: &Data<TeraTemplates>, page: &str, template: &str)
 pub async fn index(tera: Data<TeraTemplates>) -> impl Responder {
     render_template(&tera, "home", "home.html").await
 }
+
+/// Renders the drag and drop component.
+///
+/// This function renders a static content page using Tera templating engine.
+/// It's an example of how to render a simple HTML page with context.
+#[get("/draganddrop")]
+pub async fn draganddrop(tera: Data<TeraTemplates>) -> impl Responder {
+    let context = Context::new();
+
+    let rendered = tera
+        .tera
+        .render("components/draganddrop.html", &context)
+        .expect("Failed to render template.");
+    HttpResponse::Ok().body(rendered)
+}
+
 /// Displays the about page.
 ///
 /// Renders the about page using the Tera templating engine.
